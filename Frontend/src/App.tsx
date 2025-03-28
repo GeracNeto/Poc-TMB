@@ -50,7 +50,7 @@ export default function App() {
                 <OrdersTable
                   orders={orders}
                   loader={loader}
-                  error={errorMessage}
+                  errorMessage={errorMessage}
                   setOrders={setOrders}
                 />
               }

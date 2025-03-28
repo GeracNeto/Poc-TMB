@@ -3,20 +3,46 @@ import { IOrder } from "../types/order.interface";
 
 interface OrderFormProps {
   formLoader: boolean;
+  errorMessage: string;
   onSubmit: (order: Partial<IOrder>) => void;
+  onClearError: () => void;
 }
 
-export default function OrderForm({ formLoader, onSubmit }: OrderFormProps) {
+export default function OrderForm({
+  formLoader,
+  errorMessage,
+  onSubmit,
+  onClearError,
+}: OrderFormProps) {
   const [cliente, setCliente] = useState("");
   const [produto, setProduto] = useState("");
-  const [valor, setValor] = useState<number | undefined>();
+  const [valor, setValor] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ cliente, produto, valor });
+    onClearError();
+
+    const valorNumerico = valor ? parseFloat(valor) : undefined;
+    onSubmit({ cliente, produto, valor: valorNumerico });
     setCliente("");
     setProduto("");
-    setValor(undefined);
+    setValor("");
+  };
+
+  const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9.]/g, "");
+    setValor(value);
+    onClearError();
+  };
+
+  const handleClienteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCliente(e.target.value);
+    onClearError();
+  };
+
+  const handleProdutoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProduto(e.target.value);
+    onClearError();
   };
 
   return (
@@ -32,7 +58,7 @@ export default function OrderForm({ formLoader, onSubmit }: OrderFormProps) {
           id="produto"
           type="text"
           value={produto}
-          onChange={(e) => setProduto(e.target.value)}
+          onChange={handleProdutoChange}
           required
           className="mt-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
           placeholder="Digite o nome do produto"
@@ -52,14 +78,15 @@ export default function OrderForm({ formLoader, onSubmit }: OrderFormProps) {
           </div>
           <input
             id="valor"
-            type="number"
+            type="text"
             value={valor}
-            onChange={(e) => setValor(Number(e.target.value))}
-            min={1}
+            onChange={handleValorChange}
+            min="0"
             step="0.01"
             required
             className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 block w-full pl-10 pr-12 sm:text-sm border-gray-300 rounded-md p-2 border"
-            placeholder="0,00"
+            placeholder="0.00"
+            inputMode="decimal"
           />
         </div>
       </div>
@@ -75,7 +102,7 @@ export default function OrderForm({ formLoader, onSubmit }: OrderFormProps) {
           id="cliente"
           type="text"
           value={cliente}
-          onChange={(e) => setCliente(e.target.value)}
+          onChange={handleClienteChange}
           required
           className="mt-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
           placeholder="Digite o nome do cliente"
@@ -116,6 +143,13 @@ export default function OrderForm({ formLoader, onSubmit }: OrderFormProps) {
           )}
         </button>
       </div>
+      {errorMessage && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4">
+          <div>
+            <p className="text-sm text-red-700">{errorMessage}</p>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

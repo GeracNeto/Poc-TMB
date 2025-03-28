@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IOrder } from "../types/order.interface";
 
-const API_URL = "http://localhost:5000/api/Order";
+const API_URL = "http://localhost:5222/api/Order";
 
 export const getOrders = async (): Promise<IOrder[]> => {
   try {
@@ -19,7 +19,6 @@ export const createOrder = async (
     const response = await axios.post<IOrder>(API_URL, newOrder);
     return response.data;
   } catch (error) {
-    console.error("Erro ao criar pedido", error);
-    return null;
+    throw new Error(`Falha ao criar pedido: ${error}`);
   }
 };

@@ -7,26 +7,27 @@ import OrderForm from "./OrderForm";
 interface OrdersTableProps {
   orders: IOrder[];
   loader: boolean;
-  error: string;
+  errorMessage: string;
   setOrders: (orders: IOrder[]) => void;
 }
 
 export function OrdersTable({
   orders,
   loader,
-  error,
+  errorMessage,
   setOrders,
 }: OrdersTableProps): JSX.Element {
   const navigate = useNavigate();
   const [enableNewOrder, setEnableNewOrder] = useState(false);
   const [formLoader, setFormLoader] = useState(false);
+  const [formErrorMessage, setFormErrorMessage] = useState("");
 
   const goToOrderDetail = (orderid: string) => {
     navigate(`/order/${orderid}`);
   };
 
   const onSubmit = async (newOrder: Partial<IOrder>) => {
-    setFormLoader(true)
+    setFormLoader(true);
     try {
       const order = await createOrder(newOrder);
       if (order) {
@@ -34,11 +35,15 @@ export function OrdersTable({
         setEnableNewOrder(false);
       }
     } catch (error) {
-      console.error("Erro ao criar pedido:", error);
+      setFormErrorMessage("Erro ao criar pedido");
+    } finally {
+      setFormLoader(false);
     }
-    finally{
-      setFormLoader(false)
-    }
+  };
+
+  const handleNewOrderButton = () => {
+    setEnableNewOrder(!enableNewOrder);
+    setFormErrorMessage("");
   };
 
   const statusColors: Record<string, string> = {
@@ -56,7 +61,7 @@ export function OrdersTable({
         </h2>
         <button
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
-          onClick={() => setEnableNewOrder(!enableNewOrder)}
+          onClick={() => handleNewOrderButton()}
         >
           {enableNewOrder ? "Cancelar" : "Novo Pedido"}
           <span className="ml-2 text-lg">{enableNewOrder ? "×" : "+"}</span>
@@ -68,7 +73,12 @@ export function OrdersTable({
           <h3 className="text-md font-medium text-gray-900 mb-4">
             Criar Novo Pedido
           </h3>
-          <OrderForm formLoader={formLoader} onSubmit={onSubmit}/>
+          <OrderForm
+            formLoader={formLoader}
+            errorMessage={formErrorMessage}
+            onSubmit={onSubmit}
+            onClearError={() => setFormErrorMessage("")}
+          />
         </div>
       )}
 
@@ -76,10 +86,10 @@ export function OrdersTable({
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
         </div>
-      ) : error.length ? (
+      ) : errorMessage.length ? (
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
           <div>
-              <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700">{errorMessage}</p>
           </div>
         </div>
       ) : (
