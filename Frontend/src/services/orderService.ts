@@ -8,8 +8,7 @@ export const getOrders = async (): Promise<IOrder[]> => {
     const response = await axios.get<IOrder[]>(API_URL);
     return response.data;
   } catch (error) {
-    console.error("Erro ao buscar pedidos", error);
-    return [];
+    throw new Error(`Falha ao buscar pedidos: ${error}`); 
   }
 };
 
