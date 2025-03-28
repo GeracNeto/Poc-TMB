@@ -48,6 +48,18 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+    db.Database.Migrate();
+    Console.WriteLine("Migrations aplicadas com sucesso!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Falha ao aplicar migrations: {ex.Message}");
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.Use(async (context, next) =>
