@@ -58,12 +58,13 @@ export function OrdersTable({
     try {
       await deleteOrder(orderid);
       setOrders(orders.filter((order) => order.id !== orderid));
+      alert("Pedido deletado com sucesso!");
     } catch (error) {
-      //setFormErrorMessage("Erro ao deletar pedido");
+      alert("Falha ao deletar pedido. Por favor, tente novamente.");
     } finally {
       setDeleteLoader({
         loader: false,
-        orderid,
+        orderid: "",
       });
     }
   };
