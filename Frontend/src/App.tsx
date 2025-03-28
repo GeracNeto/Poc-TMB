@@ -46,7 +46,8 @@ export default function App() {
       <div className="min-h-screen bg-gray-100">
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-900">TMB Pedidos</h1>
+            <img src="https://cdn.prod.website-files.com/6357d4aeff33e738c1d2c99a/65f1a2c6485719759df26f56_img-01.png" alt="TMB Logo"  className="h-10 sm:block hidden"/>
+            <h1 className="text-xl font-bold text-gray-900">Gerenciador de Pedidos</h1>
             <nav>
               <Link to="/" className="text-gray-600 hover:text-gray-900">
                 Lista de Pedidos

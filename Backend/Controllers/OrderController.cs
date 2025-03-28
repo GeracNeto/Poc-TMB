@@ -28,7 +28,23 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetOrderById(Guid id)
         {
-            return Ok(await _context.Orders.FirstOrDefaultAsync(o => o.ID == id));
+            try
+            {
+                Order order = await _context.Orders.FirstOrDefaultAsync(o => o.ID == id);
+
+                if (order == null) return NotFound(new { message = "Pedido não encontrado" });
+
+                return Ok(await _context.Orders.FirstOrDefaultAsync(o => o.ID == id));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Erro inesperado ao buscar o pedido.",
+                    error = ex.Message
+                });
+            }
         }
 
         [HttpPost]

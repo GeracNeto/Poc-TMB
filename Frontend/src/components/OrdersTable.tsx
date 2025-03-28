@@ -35,7 +35,7 @@ export function OrdersTable({
     try {
       const order = await createOrder(newOrder);
       if (order) {
-        setOrders([...orders, order]);
+        setOrders([order, ...orders]);
         setEnableNewOrder(false);
       }
     } catch (error) {
