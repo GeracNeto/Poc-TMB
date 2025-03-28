@@ -1,5 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using Backend.Context;
+using Backend.Hubs;
+using Backend.Services;
 using Backend.Workers;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,9 +24,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllOrigins",
         policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("http://localhost:5173") 
                   .AllowAnyMethod()
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .AllowCredentials(); 
         });
 });
 
@@ -38,6 +41,9 @@ builder.Services.AddSingleton(serviceProvider =>
     return client.CreateSender(queueName);
 });
 
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -53,6 +59,8 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAllOrigins");
 
 app.UseAuthorization();
+
+app.MapHub<OrderHub>("order-hub"); // Mapeamento do hub
 
 app.MapControllers();
 

@@ -1,6 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Backend.Context;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,7 +49,8 @@ namespace Backend.Workers
                 }
 
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                DataContext dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                IOrderService orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
 
                 Order order = await dbContext.Orders.FirstOrDefaultAsync(o => o.ID == orderMessage.OrderId);
                 if (order == null)
@@ -57,10 +59,15 @@ namespace Backend.Workers
                     return;
                 }
 
+                // Espera 5 segundos para mudar para "Processando"
+                await Task.Delay(TimeSpan.FromSeconds(5));
+
                 // Atualizar status para "Processando"
                 order.Status = "Processando";
                 await dbContext.SaveChangesAsync();
                 _logger.LogInformation($"Pedido {order.ID} atualizado para 'Processando'.");
+
+                orderService.NotifyOrderUpdate(order.ID, order.Status);
 
                 // Espera 5 segundos antes de finalizar o pedido
                 await Task.Delay(TimeSpan.FromSeconds(5));
@@ -69,6 +76,8 @@ namespace Backend.Workers
                 order.Status = "Finalizado";
                 await dbContext.SaveChangesAsync();
                 _logger.LogInformation($"Pedido {order.ID} atualizado para 'Finalizado'.");
+
+                orderService.NotifyOrderUpdate(order.ID, order.Status);
 
                 await args.CompleteMessageAsync(args.Message);
             }
