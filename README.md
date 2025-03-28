@@ -64,9 +64,7 @@ Siga estes passos para executar a aplicação:
 - ✅ Inicialização dos serviços conectados
 
 ## 🎥 DEMO
-<video src="Prints/DEMO.mp4" controls width="100%">
-Seu navegador não suporta a tag <code>video</code>.
-</video>
+<img src="./Prints/DEMO.gif">
 
 ## Prints do projeto
 
