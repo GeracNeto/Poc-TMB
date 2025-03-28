@@ -62,7 +62,7 @@ namespace Backend.Workers
                 // Espera 5 segundos para mudar para "Processando"
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
-                // Atualizar status para "Processando"
+                // Atualiza o status para "Processando"
                 order.Status = "Processando";
                 await dbContext.SaveChangesAsync();
                 _logger.LogInformation($"Pedido {order.ID} atualizado para 'Processando'.");
@@ -72,11 +72,12 @@ namespace Backend.Workers
                 // Espera 5 segundos antes de finalizar o pedido
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
-                // Atualizar status para "Finalizado"
+                // Atualiza o status para "Finalizado"
                 order.Status = "Finalizado";
                 await dbContext.SaveChangesAsync();
                 _logger.LogInformation($"Pedido {order.ID} atualizado para 'Finalizado'.");
 
+                // Notifica os clientes com SignalR
                 orderService.NotifyOrderUpdate(order.ID, order.Status);
 
                 await args.CompleteMessageAsync(args.Message);

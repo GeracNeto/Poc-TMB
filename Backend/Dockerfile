@@ -4,12 +4,10 @@ COPY . ./
 RUN dotnet restore
 RUN dotnet publish -c Release -o /out
 
-# Etapa 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /out ./ 
 
-# Expõe a porta que o ASP.NET Core usa por padrão
 EXPOSE 80
 EXPOSE 443
 
