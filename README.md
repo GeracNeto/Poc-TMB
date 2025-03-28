@@ -41,7 +41,7 @@ Siga estes passos para executar a aplicação:
 
 1. **Clone o repositório** (ou baixe o código fonte):
    ```bash
-   git clone https://github.com/seu-usuario/Poc-TMB.git
+   git clone https://github.com/GeracNeto/Poc-TMB.git
    
    cd Poc-TMB
 2. **Dentro da pasta Poc_TMB Execute os containers com Docker Compose**
