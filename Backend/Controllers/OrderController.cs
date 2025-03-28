@@ -20,13 +20,13 @@ namespace Backend.Controllers
         private readonly ServiceBusSender _serviceBusSender = serviceBusSender;
 
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> GetOrderList()
         {
             return Ok(await _context.Orders.ToListAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> Get(Guid id)
+        public async Task<ActionResult> GetOrderById(Guid id)
         {
             return Ok(await _context.Orders.FirstOrDefaultAsync(o => o.ID == id));
         }
@@ -57,13 +57,52 @@ namespace Backend.Controllers
             }
             catch (DbUpdateException dbEx)
             {
-                return StatusCode(500, new { message = "Erro ao salvar no banco de dados.", error = dbEx.InnerException?.Message ?? dbEx.Message });
+                return StatusCode(500, new 
+                { 
+                    message = "Erro ao salvar no banco de dados.", 
+                    error = dbEx.InnerException?.Message ?? dbEx.Message 
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Erro inesperado ao criar o pedido.", error = ex.Message });
+                return StatusCode(500, new 
+                { 
+                    message = "Erro inesperado ao criar o pedido.", 
+                    error = ex.Message 
+                });
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteOrderById(Guid id)
+        {
+            try
+            {
+                Order order = await _context.Orders.FirstOrDefaultAsync(o => o.ID == id);
+
+                if (order == null) return NotFound(new { message = "Pedido não encontrado" });
+
+                _context.Orders.Remove(order);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Erro ao deletar o pedido no banco de dados.",
+                    error = dbEx.InnerException?.Message ?? dbEx.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Erro inesperado ao deletar o pedido.",
+                    error = ex.Message
+                });
+            }
+        }
     }
 }

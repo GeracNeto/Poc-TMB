@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
-import { HttpTransportType, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import {
+  HttpTransportType,
+  HubConnectionBuilder,
+  LogLevel,
+} from "@microsoft/signalr";
 
-const SIGNAL_HUB = "http://localhost:5222/order-hub";
+const SIGNAL_HUB = "http://localhost:5000/order-hub";
 
 export const useSignalR = () => {
   const [orderUpdate, setOrderUpdate] = useState(null);
