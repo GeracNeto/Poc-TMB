@@ -26,6 +26,19 @@ export default function App() {
       }
     };
     fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    if (orderUpdate) {
+      setOrders((prevOrders) => {
+        return prevOrders.map((order) => {
+          if (order.id === orderUpdate.id) {
+            return { ...order, status: orderUpdate.status };
+          }
+          return order;
+        });
+      });
+    }
   }, [orderUpdate]);
 
   return (

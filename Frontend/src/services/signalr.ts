@@ -4,10 +4,11 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
+import { ISignalROrder } from "../types/signalr.interface";
 
-const SIGNAL_HUB = "http://localhost:5000/order-hub";
+const SIGNAL_HUB = "http://localhost:5222/order-hub";
 
-export const useSignalR = () => {
+export const useSignalR = (): ISignalROrder => {
   const [orderUpdate, setOrderUpdate] = useState(null);
 
   useEffect(() => {
