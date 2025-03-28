@@ -4,11 +4,14 @@ import { OrdersTable } from "./components/OrdersTable";
 import { IOrder } from "./types/order.interface";
 import { getOrders } from "./services/orderService";
 import { OrderDetail } from "./components/OrderDetail";
+import { useSignalR } from "./services/signalr";
 
 export default function App() {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loader, setLoader] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const orderUpdate = useSignalR();
 
   useEffect(() => {
     setLoader(true);
@@ -23,7 +26,7 @@ export default function App() {
       }
     };
     fetchOrders();
-  }, []);
+  }, [orderUpdate]);
 
   return (
     <Router>
