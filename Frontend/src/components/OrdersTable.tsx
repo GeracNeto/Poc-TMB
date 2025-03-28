@@ -46,6 +46,8 @@ export function OrdersTable({
     setFormErrorMessage("");
   };
 
+  const handleDelete = (orderid: string) => {};
+
   const statusColors: Record<string, string> = {
     Pendente: "bg-yellow-100 text-yellow-800",
     Processando: "bg-blue-100 text-blue-800",
@@ -134,16 +136,22 @@ export function OrdersTable({
                   >
                     Data Criação
                   </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Ação
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => goToOrderDetail(order.id)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={order.id} className="hover:bg-gray-50">
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-400 hover:text-blue-700 hover:underline cursor-pointer"
+                      onClick={() => goToOrderDetail(order.id)}
+                      title="Detalhes do pedido"
+                    >
                       {order.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -172,18 +180,42 @@ export function OrdersTable({
                           )
                         : "Data inválida"}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(order.id);
+                        }}
+                        className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Deletar pedido"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <div className="text-center py-8">
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
               <svg
                 className="mx-auto h-12 w-12 text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
