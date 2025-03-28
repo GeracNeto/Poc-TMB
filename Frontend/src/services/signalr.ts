@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { HubConnectionBuilder } from "@microsoft/signalr";
+import { HttpTransportType, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
-const SIGNAL_HUB = "http://localhost:5222/order-hub";
+const SIGNAL_HUB = "http://localhost:5000/order-hub";
 
 export const useSignalR = () => {
   const [orderUpdate, setOrderUpdate] = useState(null);
 
   useEffect(() => {
-    const connection = new HubConnectionBuilder().withUrl(SIGNAL_HUB).build();
+    const connection = new HubConnectionBuilder()
+      .withUrl(SIGNAL_HUB, {
+        skipNegotiation: true,
+        transport: HttpTransportType.WebSockets,
+      })
+      .configureLogging(LogLevel.Information)
+      .build();
 
     connection.on("OrderUpdate", (message) => {
       setOrderUpdate(message);

@@ -7,32 +7,34 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 Console.WriteLine($"Connected DataBase: {builder.Configuration.GetConnectionString("DefaultConnection")}");
 
-// Add services to the container.
-
+// Adicionando serviços ao container
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var frontendUrl = builder.Configuration["FrontendUrl"];
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173") 
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials(); 
-        });
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins(frontendUrl)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .WithExposedHeaders("Content-Disposition");
+    });
 });
 
 builder.Services.AddHostedService<OrderProcessingWorker>();
 
+// Configuração do Azure Service Bus
 builder.Services.AddSingleton(serviceProvider =>
 {
     var connectionString = builder.Configuration["AzureServiceBus:ConnectionString"];
@@ -42,26 +44,30 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 
 builder.Services.AddScoped<IOrderService, OrderService>();
-
 builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", frontendUrl);
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+        await next();
+    });
 }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
-app.MapHub<OrderHub>("order-hub"); // Mapeamento do hub
-
+app.MapHub<OrderHub>("order-hub");
 app.MapControllers();
 
 app.Run();

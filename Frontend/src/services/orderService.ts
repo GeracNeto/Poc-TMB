@@ -1,14 +1,14 @@
 import axios from "axios";
 import { IOrder } from "../types/order.interface";
 
-const API_URL = "http://localhost:5222/api/Order";
+const API_URL = "http://localhost:5000/api/Order";
 
 export const getOrders = async (): Promise<IOrder[]> => {
   try {
     const response = await axios.get<IOrder[]>(API_URL);
     return response.data;
   } catch (error) {
-    throw new Error(`Falha ao buscar pedidos: ${error}`); 
+    throw new Error(`Falha ao buscar pedidos: ${error}`);
   }
 };
 
