@@ -1,4 +1,6 @@
+using Azure.Messaging.ServiceBus;
 using Backend.Context;
+using Backend.Workers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,17 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader();
         });
 });
+
+builder.Services.AddHostedService<OrderProcessingWorker>();
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var connectionString = builder.Configuration["AzureServiceBus:ConnectionString"];
+    var queueName = builder.Configuration["AzureServiceBus:QueueName"];
+    var client = new ServiceBusClient(connectionString);
+    return client.CreateSender(queueName);
+});
+
 
 var app = builder.Build();
 

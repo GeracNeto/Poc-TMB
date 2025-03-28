@@ -1,8 +1,11 @@
-﻿using Backend.Context;
+﻿using Azure.Messaging.ServiceBus;
+using Backend.Context;
 using Backend.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,9 +13,11 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController(DataContext context) : ControllerBase
+    public class OrderController(DataContext context, ServiceBusSender serviceBusSender) : ControllerBase
     {
+
         private readonly DataContext _context = context;
+        private readonly ServiceBusSender _serviceBusSender = serviceBusSender;
 
         [HttpGet]
         public async Task<ActionResult> Get()
@@ -42,6 +47,11 @@ namespace Backend.Controllers
 
                 await _context.Orders.AddAsync(orderObj);
                 await _context.SaveChangesAsync();
+
+                var messageBody = JsonSerializer.Serialize(new { OrderId = orderObj.ID });
+                var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(messageBody));
+
+                await _serviceBusSender.SendMessageAsync(message);
 
                 return StatusCode(201, orderObj);
             }
